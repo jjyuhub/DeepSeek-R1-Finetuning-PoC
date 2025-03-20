@@ -1,0 +1,60 @@
+name: DeepSeek R1 Finetuning PoC
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  finetune:
+    runs-on: ubuntu-latest
+    # Limit the entire job to 5 hours (300 minutes)
+    timeout-minutes: 300
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install unsloth transformers datasets wandb
+
+      - name: Run Pre-finetuning Demo
+        run: |
+          echo "Running pre-finetuning inference demo..."
+          python demo.py --phase pre > pre_demo.txt
+          echo "Pre-finetuning demo output:"
+          cat pre_demo.txt
+
+      - name: Run Fine-Tuning (5 Hours Maximum)
+        run: |
+          echo "Starting fine-tuning for up to 5 hours..."
+          # This training job (train.py) should be set up to fine-tune DeepSeek R1 1B
+          python train.py
+        # The job will be forcibly terminated if it exceeds 5 hours.
+
+      - name: Run Post-finetuning Demo
+        run: |
+          echo "Running post-finetuning inference demo..."
+          python demo.py --phase post > post_demo.txt
+          echo "Post-finetuning demo output:"
+          cat post_demo.txt
+
+      - name: Combine and Save Demo Outputs
+        run: |
+          echo "=== Pre-finetuning Demo Output ===" > demo_results.txt
+          cat pre_demo.txt >> demo_results.txt
+          echo "\n=== Post-finetuning Demo Output ===" >> demo_results.txt
+          cat post_demo.txt >> demo_results.txt
+
+      - name: Upload Demo Results Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: demo-results
+          path: demo_results.txt
