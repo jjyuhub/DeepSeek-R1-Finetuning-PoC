@@ -36,7 +36,7 @@ jobs:
         run: |
           echo "Starting fine-tuning for up to 5 hours..."
           # This training job (train.py) should be set up to fine-tune DeepSeek R1 1B
-          python train.py
+          python run_test.py
         # The job will be forcibly terminated if it exceeds 5 hours.
 
       - name: Run Post-finetuning Demo
