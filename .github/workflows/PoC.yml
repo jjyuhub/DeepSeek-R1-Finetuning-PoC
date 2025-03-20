@@ -54,7 +54,7 @@ jobs:
           cat post_demo.txt >> demo_results.txt
 
       - name: Upload Demo Results Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: demo-results
           path: demo_results.txt
